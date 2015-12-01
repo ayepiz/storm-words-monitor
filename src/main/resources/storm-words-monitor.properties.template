@@ -1,0 +1,7 @@
+#Semicolon separed phrases to monitor
+phrases=
+mongoHost=
+mongoPort=
+mongoDBName=
+mongoTwitterQueueCollection=
+mongoTickerCollection=
