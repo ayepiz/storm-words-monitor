@@ -47,7 +47,7 @@ public class WordsMonitorTopology {
         		runAs = args[1];
         }
 
-        if(runAs == "remote") {
+        if(runAs.equalsIgnoreCase("remote")) {
         	submitRemotely(builder, topologyName);
         } else {
         	submitLocally(builder, topologyName);
