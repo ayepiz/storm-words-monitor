@@ -41,6 +41,7 @@ import org.bson.Document;
  * @author Dan Beaulieu <danjacob.beaulieu@gmail.com>
  */
 public abstract class MongoSpoutBase extends BaseRichSpout {
+	private static final long serialVersionUID = 3000000L;
 
     private SpoutOutputCollector collector;
 

@@ -28,6 +28,7 @@ public class Twitter {
             public void onTrackLimitationNotice(int numberOfLimitedStatuses) {}
             public void onException(Exception ex) {
                 ex.printStackTrace();
+                queue.closeCnn();
             }
             public void onScrubGeo(long l, long l1) {}
             public void onStallWarning(StallWarning arg0) {}
@@ -38,7 +39,7 @@ public class Twitter {
 
         //twitterStream.sample();
         FilterQuery tweetFilterQuery = new FilterQuery();
-        tweetFilterQuery.track(props.getProperty("phrases").split(";")); // OR on keywords
+        tweetFilterQuery.track(props.getProperty("topics").split(";")); // OR on keywords
         tweetFilterQuery.language(new String[]{"en","es"});
         twitterStream.filter(tweetFilterQuery);
     }

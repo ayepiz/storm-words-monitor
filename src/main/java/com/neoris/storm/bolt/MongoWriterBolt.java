@@ -4,7 +4,6 @@ import backtype.storm.task.TopologyContext;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import com.mongodb.MongoClient;
 import com.mongodb.client.MongoCollection;
@@ -13,14 +12,14 @@ import com.mongodb.client.MongoIterable;
 import com.mongodb.client.model.CreateCollectionOptions;
 import org.bson.Document;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Map;
 
 /**
  * Created by jesus.yepiz on 11/30/2015.
  */
 public class MongoWriterBolt  extends BaseRichBolt {
+	private static final long serialVersionUID = 4000000L;
+	
     OutputCollector _collector;
     private MongoDatabase mongoDB;
     private MongoCollection<Document> mongoCollection;
@@ -56,7 +55,7 @@ public class MongoWriterBolt  extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         Document doc = new Document();
-        doc.append("phrase",tuple.getValue(0));
+        doc.append("topic",tuple.getValue(0));
         doc.append("time",tuple.getValue(1));
         doc.append("count",tuple.getValue(2));
         doc.append("dateTime",tuple.getValue(3));

@@ -5,4 +5,5 @@ package com.neoris.stream.endpoint;
  */
 public interface EndPoint {
     public void write(Object[] row);
+    public void closeCnn();
 }

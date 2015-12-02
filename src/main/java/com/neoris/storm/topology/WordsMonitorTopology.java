@@ -2,12 +2,13 @@ package com.neoris.storm.topology;
 
 import backtype.storm.Config;
 import backtype.storm.LocalCluster;
+import backtype.storm.StormSubmitter;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.tuple.Fields;
 import backtype.storm.utils.Utils;
 import com.neoris.storm.bolt.MongoWriterBolt;
 import com.neoris.storm.bolt.RollingCountBolt;
-import com.neoris.storm.bolt.ExtractPhrasesBolt;
+import com.neoris.storm.bolt.ExtractTopicsBolt;
 import com.neoris.storm.spout.MongoSpout;
 import com.neoris.stream.Twitter;
 import twitter4j.TwitterException;
@@ -30,18 +31,42 @@ public class WordsMonitorTopology {
         builder.setSpout("TextEmitter", new MongoSpout(props.getProperty("mongoHost"),Integer.parseInt(props.getProperty("mongoPort")),
                 props.getProperty("mongoDBName"), props.getProperty("mongoTwitterQueueCollection")), 1);
 
-        builder.setBolt("PhrasesExtracter", new ExtractPhrasesBolt(props.getProperty("phrases").split(";")),1).shuffleGrouping("TextEmitter");
+        builder.setBolt("TopicsExtracter", new ExtractTopicsBolt(props.getProperty("topics").split(";")),1).shuffleGrouping("TextEmitter");
 
-        builder.setBolt("PhrasesCounter", new RollingCountBolt(60,10), 2).fieldsGrouping("PhrasesExtracter", new Fields("phrase"));
+        builder.setBolt("TopicsCounter", new RollingCountBolt(600,5), 2).fieldsGrouping("TopicsExtracter", new Fields("topic"));
 
         builder.setBolt("MongoStorer", new MongoWriterBolt(props.getProperty("mongoHost"),Integer.parseInt(props.getProperty("mongoPort")),
-                props.getProperty("mongoDBName"), props.getProperty("mongoTickerCollection")), 1).globalGrouping("PhrasesCounter");
+                props.getProperty("mongoDBName"), props.getProperty("mongoTickerCollection")), 1).globalGrouping("TopicsCounter");
 
+        String topologyName = "TopicsMonitorTopology";
+        String runAs = "local";
+
+        if(args != null && args.length > 0) {
+        	topologyName = args[0];
+        	if(args[1] != null)
+        		runAs = args[1];
+        }
+
+        if(runAs == "remote") {
+        	submitRemotely(builder, topologyName);
+        } else {
+        	submitLocally(builder, topologyName);
+        }
+    }
+    
+    private static void submitRemotely(TopologyBuilder builder, String name) throws Exception {
+        Config conf = new Config();
+        conf.setDebug(false);
+        
+        StormSubmitter.submitTopologyWithProgressBar(name, conf, builder.createTopology());
+    }
+    
+    private static void submitLocally(TopologyBuilder builder, String name) {
         Config conf = new Config();
         conf.setDebug(true);
 
         LocalCluster cluster = new LocalCluster();
-        cluster.submitTopology("test", conf, builder.createTopology());
+        cluster.submitTopology(name, conf, builder.createTopology());
 
         Runnable writer = new Runnable() {
 
@@ -58,9 +83,9 @@ public class WordsMonitorTopology {
         };
 
         new Thread(writer).start();
-        Utils.sleep(60000);
-        cluster.killTopology("test");
-        cluster.shutdown();
+        Utils.sleep(120000);
+        cluster.killTopology(name);
+        cluster.shutdown();    	
     }
 
 }

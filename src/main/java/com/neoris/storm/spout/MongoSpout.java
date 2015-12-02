@@ -9,6 +9,7 @@ import org.bson.Document;
  * Created by jesus.yepiz on 11/29/2015.
  */
 public class MongoSpout extends MongoSpoutBase {
+	private static final long serialVersionUID = 2000000L;
 
     public MongoSpout(String mongoHost, int mongoPort, String mongoDbName, String mongoCollectionName) {
         super(mongoHost, mongoPort, mongoDbName, mongoCollectionName);

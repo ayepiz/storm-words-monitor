@@ -9,3 +9,18 @@ target/
 
 # Configuration
 src/main/resources/*.properties
+
+# Eclipse Core
+.project
+.settings/
+
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
+
+# Dependency directory
+# https://docs.npmjs.com/misc/faq#should-i-check-my-node-modules-folder-into-git
+node_modules
+
+.jshintrc
+.sublime-project
+.tern-project

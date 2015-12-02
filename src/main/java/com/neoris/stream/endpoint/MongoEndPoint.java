@@ -15,8 +15,9 @@ import org.bson.Document;
  */
 public class MongoEndPoint implements EndPoint {
 
+	private final MongoClient mongoCnn;
     private final MongoDatabase mongoDB;
-    private final MongoCollection mongoQueue;
+    private final MongoCollection<Document> mongoQueue;
 
     /*private final String mongoHost;
     private final int mongoPort;
@@ -30,7 +31,8 @@ public class MongoEndPoint implements EndPoint {
         this.mongoDbName = mongoDbName;
         this.mongoQueueName = mongoQueueName;*/
 
-        this.mongoDB = new MongoClient(mongoHost, mongoPort).getDatabase(mongoDbName);
+    	this.mongoCnn = new MongoClient(mongoHost, mongoPort); 
+        this.mongoDB = this.mongoCnn.getDatabase(mongoDbName);
         if(collectionExists(mongoQueueName)) {
             this.mongoDB.getCollection(mongoQueueName).drop();
         }
@@ -48,6 +50,11 @@ public class MongoEndPoint implements EndPoint {
         doc.append("dateTime",row[0]);
         doc.append("text",row[1]);
         this.mongoQueue.insertOne(doc);
+    }
+    
+    @Override
+    public void closeCnn() {
+    	this.mongoCnn.close();
     }
 
     private boolean collectionExists(final String collectionName) {

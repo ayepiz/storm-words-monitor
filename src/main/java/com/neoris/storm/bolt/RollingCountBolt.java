@@ -125,7 +125,7 @@ public class RollingCountBolt extends BaseRichBolt {
         for (Entry<Object, Long> entry : counts.entrySet()) {
             Object obj = entry.getKey();
             Long count = entry.getValue();
-            collector.emit(new Values(obj, Instant.now().getEpochSecond() , count, new Date()));
+            collector.emit(new Values(obj, System.currentTimeMillis(), count, new Date()));
         }
     }
 
@@ -137,7 +137,7 @@ public class RollingCountBolt extends BaseRichBolt {
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("phrase", "time", "count", "dateTime"));
+        declarer.declare(new Fields("topic", "time", "count", "dateTime"));
     }
 
     @Override
